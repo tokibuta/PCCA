@@ -4,10 +4,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityStandardAssets.CrossPlatformInput;
 
-public class CreateLineManager1 : MonoBehaviour {
+//ラインを等間隔に分割する処理を試していた(多分完成している？)
+public class CreateLineManager1 : MonoBehaviour
+{
 
 	//MonoBehaviourを継承している場合に new キーワードを使うと警告が出るためインナークラスを使用
-	static class ObjectPool{
+	static class ObjectPool
+	{
 
 		//インナークラスフィールドはLoadScene後にもデータが残っている(staticだから？)
 		private static List<GameObject> objList;
@@ -19,25 +22,31 @@ public class CreateLineManager1 : MonoBehaviour {
 		///	オブジェクトプールを作成する。
 		/// InitPool(プールするオブジェクト, サイズ, 親オブジェクト)
 		/// </summary>
-		public static void InitPool(GameObject tmpObj, int initSize, GameObject tmpParent){
+		public static void InitPool(GameObject tmpObj, int initSize, GameObject tmpParent)
+		{
 			objList = new List<GameObject>();
 			parent = tmpParent;
 			obj = tmpObj;
-			for(int i = 0; i < initSize; i++){
+			for(int i = 0; i < initSize; i++)
+			{
 				CreateObject();
 			}
 		}
 
-		private static void CreateObject(){
+		private static void CreateObject()
+		{
 			newObj = Instantiate(obj, parent.transform);
 			newObj.name = newObj.name + (objList.Count + 1);
 			newObj.SetActive(false);
 			objList.Add(newObj);
 		}
 
-		public static GameObject GetObject(){
-			for(int i = 0; i < objList.Count; i++){
-				if(!objList[i].activeSelf){
+		public static GameObject GetObject()
+		{
+			for(int i = 0; i < objList.Count; i++)
+			{
+				if(!objList[i].activeSelf)
+				{
 					objList[i].SetActive(true);
 					// // Debug.Log(objList[i]);
 					return objList[i];
@@ -50,9 +59,12 @@ public class CreateLineManager1 : MonoBehaviour {
 			return newObj;
 		}
 
-		public static void Recycle(){
-			for(int i = 0; i < objList.Count; i++){
-				if(objList[i].activeSelf){
+		public static void Recycle()
+		{
+			for(int i = 0; i < objList.Count; i++)
+			{
+				if(objList[i].activeSelf)
+				{
 					objList[i].GetComponent<RecycleObject>().RecycleStartNow = true;
 				}
 			}
@@ -145,7 +157,8 @@ public class CreateLineManager1 : MonoBehaviour {
 	private Transform penTransform;
 	private Rigidbody2D penTransformRb;
 
-	void Start () {
+	void Start ()
+	{
 		
 		VariableHolder.Instance.PauseLine = false;
 		VariableHolder.Instance.BombCount = 0;
@@ -163,14 +176,17 @@ public class CreateLineManager1 : MonoBehaviour {
 		penTransformRb = this.GetComponent<Rigidbody2D>();
 	}
 	
-	void Update () {
+	void Update ()
+	{
 
-		if(VariableHolder.Instance.PauseLine){
+		if(VariableHolder.Instance.PauseLine)
+		{
 			return;
 		}
 
 		//ボムボタン押下時
-		if(CrossPlatformInputManager.GetButtonUp("Fire2")){
+		if(CrossPlatformInputManager.GetButtonUp("Fire2"))
+		{
 			//ObjectPoolのリストに乗っているオブジェクトをすべてにリサイクル処理を実施
 			ObjectPool.Recycle();
 
@@ -182,14 +198,16 @@ public class CreateLineManager1 : MonoBehaviour {
 		}
 
 		//2019/03/15追記 外部からの要因によりゲージを増減させる処理
-		switch(VariableHolder.Instance.GaugeCommand){
+		switch(VariableHolder.Instance.GaugeCommand)
+		{
 			case 0:
 				//今の所何もしない
 				break;
 
 			case 1:
 				//ゲージを増加
-				if(timeLimit < 400){
+				if(timeLimit < 400)
+				{
 					timeLimit += timePlus;
 				}
 				break;
@@ -198,7 +216,8 @@ public class CreateLineManager1 : MonoBehaviour {
 				//ゲージを減少
 				// Debug.Log("minus");
 				timeLimit -= timeMinus;
-				if(timeLimit <= 0){
+				if(timeLimit <= 0)
+				{
 					timeLimit = 0;
 				}
 				break;
@@ -211,6 +230,7 @@ public class CreateLineManager1 : MonoBehaviour {
 		// var touch = CrossInput.GetAction();
 		// var position = CrossInput.GetPosition();
 
+		//マルチタッチに対応
 		CrossInput.Data[] myTouches = CrossInput.GetData();
 		if(myTouches != null)
 		{
@@ -297,7 +317,8 @@ public class CreateLineManager1 : MonoBehaviour {
 				if(!penCollision[myTouches[i].GetFingerId()] && myTouches[i].GetPhase() == CrossInput.Action.Began)
 				{
 					//仮想ペンエフェクト開始
-					if(!virtualPenParticle[myTouches[i].GetFingerId()].isPlaying){
+					if(!virtualPenParticle[myTouches[i].GetFingerId()].isPlaying)
+					{
 						virtualPenParticle[myTouches[i].GetFingerId()].Play();
 					}
 
@@ -308,7 +329,8 @@ public class CreateLineManager1 : MonoBehaviour {
 
 					//ゲージを減らす
 					timeLimit -= timeMinus;
-					if(timeLimit <= 0){
+					if(timeLimit <= 0)
+					{
 						timeLimit = 0;
 						return;
 					}
@@ -327,7 +349,8 @@ public class CreateLineManager1 : MonoBehaviour {
 						if(beforeAction[myTouches[i].GetFingerId()] == myTouches[i].GetPhase() && beforeCollision[myTouches[i].GetFingerId()])
 						{
 							//仮想ペンエフェクト開始
-							if(!virtualPenParticle[myTouches[i].GetFingerId()].isPlaying){
+							if(!virtualPenParticle[myTouches[i].GetFingerId()].isPlaying)
+							{
 								virtualPenParticle[myTouches[i].GetFingerId()].Play();
 							}
 							
@@ -341,7 +364,8 @@ public class CreateLineManager1 : MonoBehaviour {
 						if(timeLimit <= 0)
 						{
 							//仮想ペンエフェクト停止
-							if(virtualPenParticle[myTouches[i].GetFingerId()].isPlaying){
+							if(virtualPenParticle[myTouches[i].GetFingerId()].isPlaying)
+							{
 								virtualPenParticle[myTouches[i].GetFingerId()].Stop();
 							}
 							
@@ -350,7 +374,8 @@ public class CreateLineManager1 : MonoBehaviour {
 							return;
 						}
 
-						if(virtualPenTransform.TryGetValue(myTouches[i].GetFingerId(), out Transform transform)){
+						if(virtualPenTransform.TryGetValue(myTouches[i].GetFingerId(), out Transform transform))
+						{
 							CreateMesh(myTouches[i].GetFingerId(), transform.position);
 						}
 					}
@@ -362,19 +387,22 @@ public class CreateLineManager1 : MonoBehaviour {
 				else if(penCollision[myTouches[i].GetFingerId()] || myTouches[i].GetPhase() == CrossInput.Action.Ended)
 				{
 					//仮想ペンエフェクト停止
-					if(virtualPenParticle[myTouches[i].GetFingerId()].isPlaying){
+					if(virtualPenParticle[myTouches[i].GetFingerId()].isPlaying)
+					{
 						virtualPenParticle[myTouches[i].GetFingerId()].Stop();
 					}
 
 					// Debug.Log("id: " + myTouches[i].GetFingerId() + " : Ended");
-					if(timeLimit < 400){
+					if(timeLimit < 400)
+					{
 						timeLimit += timePlus;
 					}
 					ChangeObject(myTouches[i].GetFingerId());
 				}
 				else if(myTouches[i].GetPhase() == CrossInput.Action.None)
 				{
-					if(timeLimit < 400){
+					if(timeLimit < 400)
+					{
 						timeLimit += timePlus;
 					}
 				}
@@ -386,14 +414,16 @@ public class CreateLineManager1 : MonoBehaviour {
 		}
 		else
 		{
-			if(timeLimit < 400){
+			if(timeLimit < 400)
+			{
 				timeLimit += timePlus;
 			}
 		}
 	}
 
     //Mesh関係初期化と第一ポイントの設定
-    private void Init(int fingerId, Vector3 point){
+    private void Init(int fingerId, Vector3 point)
+	{
 
 		create = true;
 
@@ -424,9 +454,11 @@ public class CreateLineManager1 : MonoBehaviour {
 		nextObjectMaterial[fingerId] = nextObject[fingerId].GetComponent<MeshRenderer>();
     }
 
-    private void CreateMesh(int fingerId, Vector3 point){
+    private void CreateMesh(int fingerId, Vector3 point)
+	{
 
-		if(!create){
+		if(!create)
+		{
 			return;
 		}
 
@@ -615,11 +647,13 @@ public class CreateLineManager1 : MonoBehaviour {
 		Debug.Log("残り : " + updateValueSum);
     }
 
-    private void ChangeObject(int fingerId){
+    private void ChangeObject(int fingerId)
+	{
 		create = false;
 
 		//同時に同じmeshを使用した複数のオブジェクトができてしまうことを防ぐ
-		if(setInfoObject.TryGetValue(fingerId, out bool result) ? result : false){
+		if(setInfoObject.TryGetValue(fingerId, out bool result) ? result : false)
+		{
 			setInfoObject[fingerId] = false;
 			var rb = nextObject[fingerId].gameObject.AddComponent<Rigidbody2D>();
 			rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
@@ -630,12 +664,14 @@ public class CreateLineManager1 : MonoBehaviour {
 	
     //Meshに合わせてPolygonCollider2Dを設定する
 	//オブジェクトをリサイクルするときはPolygonCollider2Dを削除する必要がある
-    private void SetCollider(int fingerId){
+    private void SetCollider(int fingerId)
+	{
 		
 		// Debug.Log("id: " + fingerId + " : " + nextObject[fingerId] + " SetCollider");
 
         //すでにPolygonCollider2Dが設定されている　又は　MeshFilterがnullの時
-        if(nextObject[fingerId].GetComponent<PolygonCollider2D>() || nextObject[fingerId].GetComponent<MeshFilter>() == null){
+        if(nextObject[fingerId].GetComponent<PolygonCollider2D>() || nextObject[fingerId].GetComponent<MeshFilter>() == null)
+		{
             return;
         }
 
@@ -651,28 +687,42 @@ public class CreateLineManager1 : MonoBehaviour {
         int i = 0;
         
         //外周を沿うように並び替え
-        try{
-            while(true){
-                if(i >= vertices[fingerId].Count){
+        try
+		{
+            while(true)
+			{
+                if(i >= vertices[fingerId].Count)
+				{
                     i--;
                     pathList.Add(vertices[fingerId][i]);
                     inc = false;
-                }else if(i == 1){
+                }
+				else if(i == 1)
+				{
                     pathList.Add(vertices[fingerId][i]);
                     break;
-                }else{
+                }
+				else
+				{
                     pathList.Add(vertices[fingerId][i]);
                 }
                 
-                if(inc){
+                if(inc)
+				{
                     i += 2;
-                }else{
+                }
+				else
+				{
                     i -= 2;
                 }
             }
-        }catch(System.Exception){
+        }
+		catch(System.Exception)
+		{
             // // Debug.Log("描き込み禁止エリアに描き込もうとしたためオブジェクトを破棄");
-        }finally{
+        }
+		finally
+		{
 			polygonCollider.SetPath(0, pathList.ToArray());
 
 			//すべての工程が終了し、ラインをオブジェクト化した後に行う初期化処理
